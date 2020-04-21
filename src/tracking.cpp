@@ -126,7 +126,14 @@ void Tracking::TrackingNode::TrackingThread(){
             imshow(windowName,Display);
         }
 
-
+        if(rs2::motion_frame accel_frame = data.first_or_default(RS2_STREAM_ACCEL)){
+            rs2_vector accel_sample = accel_frame.get_motion_data();
+            std::cout<<"Accel:"<<accel_sample.x<<','<<accel_sample.y<<','<<accel_sample.z<<std::endl;
+        }
+        if(rs2::motion_frame gyro_frame = data.first_or_default(RS2_STREAM_GYRO)){
+            rs2_vector gyro_sample = gyro_frame.get_motion_data();
+            std::cout<<"Gyro:"<<gyro_sample.x<<','<<gyro_sample.y<<','<<gyro_sample.z<<std::endl;
+        }
         switch(waitKey(1))
         {
             case 'q':
