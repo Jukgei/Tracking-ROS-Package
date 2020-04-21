@@ -40,8 +40,8 @@ void Tracking::TrackingNode::InitPublishers(ros::NodeHandle &n){
 }
 
 void Tracking::TrackingNode::InitTrackingThread(){
-    std::thread track(std::bind(&TrackingNode::TrackingThread,this));
-    track.detach();
+    std::thread tra(std::bind(&TrackingNode::TrackingThread,this));
+    tra.detach();
 }
 
 void Tracking::mouse_pick_roi(int event, int x, int y,int flags, void * param)

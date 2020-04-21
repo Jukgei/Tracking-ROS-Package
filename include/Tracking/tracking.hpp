@@ -12,10 +12,10 @@
 #include <std_msgs/UInt8.h>
 
 //DJI include 
-#include "../../../../devel/include/dji_sdk/DroneTaskControl.h"
-#include "../../../../devel/include/dji_sdk/SDKControlAuthority.h"
-
-#include "../../../dji_sdk/include/dji_sdk/dji_sdk.h"
+//#include "../../../../devel/include/dji_sdk/DroneTaskControl.h"
+//#include "../../../../devel/include/dji_sdk/SDKControlAuthority.h"
+//
+//#include "../../../dji_sdk/include/dji_sdk/dji_sdk.h"
 
 //#include "Tracking/tracking.h"
 #include <iostream>
