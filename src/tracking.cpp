@@ -1,14 +1,11 @@
 #include "../include/Tracking/tracking.hpp"
+#include <thread>
+#include <unistd.h>
 #include <iostream>
-
 
 Tracking::TrackingNode::TrackingNode(ros::NodeHandle &n){
 
     
-    check_line_state = false;
-    First_flag = true;       
-    submit_roi_flag = false; 
-    end_loop_flag = false;
     isDisplay = true;
     windowName = "RealSense";
 
@@ -47,7 +44,7 @@ void Tracking::TrackingNode::InitTrackingThread(){
     track.detach();
 }
 
-void Tracking::TrackingNode::mouse_pick_roi(int event, int x, int y,int flags, void * param)
+void Tracking::mouse_pick_roi(int event, int x, int y,int flags, void * param)
 {
     ROI_zone * zone = (ROI_zone *)param;
     if(event == CV_EVENT_LBUTTONDOWN)
@@ -86,7 +83,8 @@ void Tracking::TrackingNode::TrackingThread(){
     config.enable_stream(RS2_STREAM_DEPTH,WIDTH,HEIGHT,RS2_FORMAT_Z16,30);
     p.start(config);
     
-    
+    rs2::align align(RS2_STREAM_COLOR);
+
     namedWindow("RealSense",WINDOW_AUTOSIZE);
 
     while( ros::ok())
@@ -200,3 +198,49 @@ void Tracking::TrackingNode::SetPointPublish(){
 
 }
 
+cv::Mat frame_to_mat(const rs2::frame& f)
+{
+    using namespace cv;
+    using namespace rs2;
+
+    auto vf = f.as<video_frame>();
+    const int w = vf.get_width();
+    const int h = vf.get_height();
+
+    if (f.get_profile().format() == RS2_FORMAT_BGR8)
+    {
+        return Mat(Size(w, h), CV_8UC3, (void*)f.get_data(), Mat::AUTO_STEP);
+    }
+    else if (f.get_profile().format() == RS2_FORMAT_RGB8)
+    {
+        auto r = Mat(Size(w, h), CV_8UC3, (void*)f.get_data(), Mat::AUTO_STEP);
+        cvtColor(r, r, COLOR_RGB2BGR);
+        return r;
+    }
+    else if (f.get_profile().format() == RS2_FORMAT_Z16)
+    {
+        return Mat(Size(w, h), CV_16UC1, (void*)f.get_data(), Mat::AUTO_STEP);
+    }
+    else if (f.get_profile().format() == RS2_FORMAT_Y8)
+    {
+        return Mat(Size(w, h), CV_8UC1, (void*)f.get_data(), Mat::AUTO_STEP);
+    }
+
+    throw std::runtime_error("Frame format is not supported yet!");
+}
+
+// Converts depth frame to a matrix of doubles with distances in meters
+cv::Mat depth_frame_to_meters(const rs2::pipeline& pipe, const rs2::depth_frame& f)
+{
+    using namespace cv;
+    using namespace rs2;
+
+    Mat dm = frame_to_mat(f);
+    dm.convertTo(dm, CV_64F);
+    auto depth_scale = pipe.get_active_profile()
+        .get_device()
+        .first<depth_sensor>()
+        .get_depth_scale();
+    dm = dm * depth_scale;
+    return dm;
+}

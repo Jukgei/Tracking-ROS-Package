@@ -17,6 +17,8 @@ if(NOT realsense2_FOUND)
 endif()
 
 add_compile_options(-std=c++11)
+## SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGE} -std=c++11 -pthread")
+
 SET(SRC_LIST src/main.cpp src/tracking.cpp)
 
 ## Declare ROS messages and services

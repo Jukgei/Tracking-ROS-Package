@@ -1,8 +1,9 @@
 // License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
-#pragma once
-
+//#pragma once
+#ifndef CVHELPER
+#define CVHELPER
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <opencv2/opencv.hpp>   // Include OpenCV API
 #include <exception>
@@ -54,3 +55,4 @@ cv::Mat depth_frame_to_meters(const rs2::pipeline& pipe, const rs2::depth_frame&
     dm = dm * depth_scale;
     return dm;
 }
+#endif
