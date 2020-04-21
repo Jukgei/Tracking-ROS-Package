@@ -39,7 +39,7 @@ include_directories( ${realsense_INCLUDE_DIR})
 
 #add_executable(auxiliary src/main.cpp src/datapackage.cpp src/arm.cpp)
 add_executable(kcf ${SRC_LIST})
-target_link_libraries(kcf ${DEPENDENCIES} ${realsense2_LIBRARY} ${OpenCV_LIBS})
+target_link_libraries(kcf ${catkin_LIBRARIES} ${DEPENDENCIES} ${realsense2_LIBRARY} ${OpenCV_LIBS})
 #add_dependencies(auxiliary beginner_tutorials_generate_messages_cpp)
 
 #add_executable(listener src/listener.cpp)
