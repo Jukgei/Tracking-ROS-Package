@@ -1,4 +1,5 @@
 #include "../include/Tracking/tracking.hpp"
+#include "../include/Tracking/kcftracker.hpp"
 #include <thread>
 #include <unistd.h>
 #include <iostream>
@@ -72,7 +73,7 @@ void Tracking::mouse_pick_roi(int event, int x, int y,int flags, void * param)
 }
 
 void Tracking::TrackingNode::TrackingThread(){
-    tracker = TrackerKCF::create();
+    //tracker = TrackerKCF::create();
     
     target.ROI_rect.x = 0;
     target.ROI_rect.y = 0;
@@ -86,6 +87,9 @@ void Tracking::TrackingNode::TrackingThread(){
     rs2::align align(RS2_STREAM_COLOR);
 
     namedWindow("RealSense",WINDOW_AUTOSIZE);
+                
+    bool HOG = true, FIXEDWINDOW = true, MULTISCALE = true, LAB = true, DSST = false; //LAB color space features
+    kcf::KCFTracker kcftracker(HOG, FIXEDWINDOW, MULTISCALE, LAB, DSST);
 
     while( ros::ok())
     {  
@@ -126,14 +130,14 @@ void Tracking::TrackingNode::TrackingThread(){
             imshow(windowName,Display);
         }
 
-        if(rs2::motion_frame accel_frame = data.first_or_default(RS2_STREAM_ACCEL)){
-            rs2_vector accel_sample = accel_frame.get_motion_data();
-            std::cout<<"Accel:"<<accel_sample.x<<','<<accel_sample.y<<','<<accel_sample.z<<std::endl;
-        }
-        if(rs2::motion_frame gyro_frame = data.first_or_default(RS2_STREAM_GYRO)){
-            rs2_vector gyro_sample = gyro_frame.get_motion_data();
-            std::cout<<"Gyro:"<<gyro_sample.x<<','<<gyro_sample.y<<','<<gyro_sample.z<<std::endl;
-        }
+        //if(rs2::motion_frame accel_frame = data.first_or_default(RS2_STREAM_ACCEL)){
+        //    rs2_vector accel_sample = accel_frame.get_motion_data();
+        //    std::cout<<"Accel:"<<accel_sample.x<<','<<accel_sample.y<<','<<accel_sample.z<<std::endl;
+        //}
+        //if(rs2::motion_frame gyro_frame = data.first_or_default(RS2_STREAM_GYRO)){
+        //    rs2_vector gyro_sample = gyro_frame.get_motion_data();
+        //    std::cout<<"Gyro:"<<gyro_sample.x<<','<<gyro_sample.y<<','<<gyro_sample.z<<std::endl;
+        //}
         switch(waitKey(1))
         {
             case 'q':
@@ -142,12 +146,15 @@ void Tracking::TrackingNode::TrackingThread(){
                 break;
             }
                     
-            case '\n':
+            case 't':
             {
                 submit_roi_flag = true;
                 cout<<"Submit"<<endl;
                 roi =  Rect2d(target.p_start,target.p_end);
-                tracker->init(color_opencv,roi);
+                //tracker->init(color_opencv,roi);
+
+                kcftracker.init(color_opencv, roi);
+
                 break;
             }
 
@@ -156,8 +163,9 @@ void Tracking::TrackingNode::TrackingThread(){
         if(end_loop_flag) {break;}
         if(submit_roi_flag)
         {
-            Tracking::tracking flag;
-            tracker->update(color_opencv,roi);
+            Tracking::tracking flag; //msg
+            //tracker->update(color_opencv,roi);
+            kcftracker.update(color_opencv, roi ); 
             rectangle(color_opencv,roi,Scalar(0,255,0),2,1);
             rectangle(depth_opencv,roi,Scalar(0,255,0),2,1);
             //cout<<roi<<"\r";

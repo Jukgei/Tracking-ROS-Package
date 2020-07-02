@@ -19,7 +19,7 @@ endif()
 add_compile_options(-std=c++11)
 ## SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGE} -std=c++11 -pthread")
 
-SET(SRC_LIST src/main.cpp src/tracking.cpp)
+SET(SRC_LIST src/main.cpp src/tracking.cpp src/fhog.cpp src/kcftracker.cpp)
 
 ## Declare ROS messages and services
 add_message_files(FILES tracking.msg setpoint.msg)
